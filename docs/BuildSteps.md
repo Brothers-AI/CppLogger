@@ -11,7 +11,7 @@
   
 ### Clone the Repository
 
-    git clone 
+    git clone https://github.com/Brothers-AI/CppLogger.git
 
 ### Build Options
 
