@@ -164,6 +164,11 @@ private:
      */
     Logger();
 
+    /**
+     * @brief Construct a new Logger object
+     */
+    Logger(const Logger&) {}
+
     // Log Level for Logs
     LogLevel mCurrLogLevel;
 

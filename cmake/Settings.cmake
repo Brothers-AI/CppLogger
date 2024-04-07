@@ -21,3 +21,11 @@ set(PROJECT_LIBRARY_DIR      ${CMAKE_BINARY_DIR}/lib)
 set(PROJECT_EXE_DIR          ${CMAKE_BINARY_DIR}/bin)
 # Examples Executable Directory
 set(PROJECT_EXAMPLES_EXE_DIR ${PROJECT_EXE_DIR}/Examples)
+
+# Build Flags for Windows MSVC Compiler
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4710 /wd4711 /wd4774 /wd4820 /wd4996") 
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4571 /wd4625 /wd4626 /wd5026 /wd5027 /wd5039") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4710 /wd4711 /wd4774 /wd4820 /wd4996") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4571 /wd4625 /wd4626 /wd5026 /wd5027 /wd5039") 
+endif()

@@ -13,6 +13,9 @@ include(${CMAKE_SOURCE_DIR}/cmake/Settings.cmake)
 # Project
 project(ExamplesCppLogger)
 
+# Executable name
+set(EXE_NAME testLogger)
+
 # Create Directory
 file(MAKE_DIRECTORY ${PROJECT_EXAMPLES_EXE_DIR})
 
@@ -31,15 +34,26 @@ link_directories(
 
 # Create Executable
 add_executable(
-    testLogger
+    ${EXE_NAME}
     ${LOGGER_EXAMPLES_DIR}/src/testLogger.cpp
 )
 
 # Linking Libraries
 target_link_libraries(
-    testLogger
+    ${EXE_NAME}
     CppLogger
 )
+
+if(${BUILD_SHARED_LIBS})
+    # Copy the DLL to Executable folder
+    if(WIN32)
+        add_custom_command(
+            TARGET ${EXE_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${PROJECT_LIBRARY_DIR}/${CMAKE_BUILD_TYPE}/CppLogger.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}
+        )
+    endif(WIN32)
+endif()
 
 # Copy Binary to install directory
 install(DIRECTORY ${PROJECT_EXAMPLES_EXE_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX})

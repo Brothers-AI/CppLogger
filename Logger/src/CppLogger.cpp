@@ -9,7 +9,15 @@
 // System Includes
 #include <string>
 #include <cstring>
+
+#if _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <stdint.h>
+#include <time.h>
+#else
 #include <sys/time.h>
+#endif // _WIN32
 
 // Logger Includes
 #include <CppLogger.h>
@@ -51,9 +59,18 @@ void printAvaialbleLogs()
  * @param format print format
  * @param args print arguments
  */
-void printLog(Logger::LogStream stream, const char *logLevelName, const char *colorCode, const char *format, va_list args, bool isSavingToFile)
+void printLog(Logger::LogStream stream, const char *logLevelName, const char *colorCode,
+              const char *format, va_list args, bool isSavingToFile)
 {
     char dateTime[30];
+#ifdef _WIN32
+    // Get System Time in Windows
+    SYSTEMTIME sysTime;
+    GetSystemTime(&sysTime);
+    sprintf(dateTime, "%d-%02d-%02d %02d:%02d:%02d:%03d",
+            sysTime.wYear, sysTime.wMonth, sysTime.wDay,
+            sysTime.wHour, sysTime.wMinute, sysTime.wSecond, sysTime.wMilliseconds);
+#else
     timeval currTime;
 
     // Get time
@@ -63,7 +80,10 @@ void printLog(Logger::LogStream stream, const char *logLevelName, const char *co
     int milliSeconds = currTime.tv_usec / 1000;
 
     struct tm tm = *localtime(reinterpret_cast<time_t *>(&currTime.tv_sec));
-    sprintf(dateTime, "%d-%02d-%02d %02d:%02d:%02d:%03d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, milliSeconds);
+    sprintf(dateTime, "%d-%02d-%02d %02d:%02d:%02d:%03d",
+            tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+            tm.tm_hour, tm.tm_min, tm.tm_sec, milliSeconds);
+#endif // _WIN32
 
     if (Logger::LogStream::STDOUT == stream)
     {
@@ -205,7 +225,7 @@ void Logger::setLogLevel(LogLevel level)
         else
         {
             // Check the Character in LOG_LEVEL
-            const unsigned char logLevel = envVarData[0];
+            const unsigned char logLevel = static_cast<unsigned char>(envVarData[0]);
             // '0' to (LOG_MAX_LEVEL - 2) - 48 to -
             // 'P' for Profile Log Level
             if ((logLevel < 48 || logLevel > (48 + (LOG_MAX_LEVEL - 2))) && (logLevel != 'P'))
@@ -273,7 +293,7 @@ void Logger::setLogStream(LogStream stream)
         else
         {
             // Check the Character in LOG_STREAM
-            const unsigned char logStream = envVarData[0];
+            const unsigned char logStream = static_cast<unsigned char>(envVarData[0]);
             // '0' and '1'
             if (logStream < 48 && logStream > 49)
             {
@@ -357,7 +377,8 @@ void Logger::fatal(const char *format, ...)
     
     va_list args;
     va_start(args, format);
-    printLog(mLogStream, "FATAL", colorCodes[static_cast<unsigned char>(LogLevel::LOG_FATAL) - 1], format, args, mIsSetLogFileInitalized);
+    printLog(mLogStream, "FATAL", colorCodes[static_cast<unsigned char>(LogLevel::LOG_FATAL) - 1],
+             format, args, mIsSetLogFileInitalized);
     va_end(args);
 
     return;
@@ -372,7 +393,8 @@ void Logger::error(const char *format, ...)
     
     va_list args;
     va_start(args, format);
-    printLog(mLogStream, "ERROR", colorCodes[static_cast<unsigned char>(LogLevel::LOG_ERROR) - 1], format, args, mIsSetLogFileInitalized);
+    printLog(mLogStream, "ERROR", colorCodes[static_cast<unsigned char>(LogLevel::LOG_ERROR) - 1],
+             format, args, mIsSetLogFileInitalized);
     va_end(args);
 
     return;
@@ -387,7 +409,8 @@ void Logger::warning(const char *format, ...)
     
     va_list args;
     va_start(args, format);
-    printLog(mLogStream, "WARN", colorCodes[static_cast<unsigned char>(LogLevel::LOG_WARN) - 1], format, args, mIsSetLogFileInitalized);
+    printLog(mLogStream, "WARN", colorCodes[static_cast<unsigned char>(LogLevel::LOG_WARN) - 1],
+             format, args, mIsSetLogFileInitalized);
     va_end(args);
 
     return;
@@ -402,7 +425,8 @@ void Logger::info(const char *format, ...)
     
     va_list args;
     va_start(args, format);
-    printLog(mLogStream, "INFO", colorCodes[static_cast<unsigned char>(LogLevel::LOG_INFO) - 1], format, args, mIsSetLogFileInitalized);
+    printLog(mLogStream, "INFO", colorCodes[static_cast<unsigned char>(LogLevel::LOG_INFO) - 1],
+             format, args, mIsSetLogFileInitalized);
     va_end(args);
 
     return;
@@ -417,7 +441,8 @@ void Logger::debug(const char *format, ...)
     
     va_list args;
     va_start(args, format);
-    printLog(mLogStream, "DEBUG", colorCodes[static_cast<unsigned char>(LogLevel::LOG_DEBUG) - 1], format, args, mIsSetLogFileInitalized);
+    printLog(mLogStream, "DEBUG", colorCodes[static_cast<unsigned char>(LogLevel::LOG_DEBUG) - 1],
+             format, args, mIsSetLogFileInitalized);
     va_end(args);
 
     return;
@@ -432,7 +457,8 @@ void Logger::trace(const char *format, ...)
     
     va_list args;
     va_start(args, format);
-    printLog(mLogStream, "TRACE", colorCodes[static_cast<unsigned char>(LogLevel::LOG_TRACE) - 1], format, args, mIsSetLogFileInitalized);
+    printLog(mLogStream, "TRACE", colorCodes[static_cast<unsigned char>(LogLevel::LOG_TRACE) - 1],
+             format, args, mIsSetLogFileInitalized);
     va_end(args);
 
     return;
@@ -447,7 +473,8 @@ void Logger::profile(const char *format, ...)
     
     va_list args;
     va_start(args, format);
-    printLog(mLogStream, "PROFILE", colorCodes[static_cast<unsigned char>(LogLevel::LOG_PROFILE) - 1], format, args, mIsSetLogFileInitalized);
+    printLog(mLogStream, "PROFILE", colorCodes[static_cast<unsigned char>(LogLevel::LOG_PROFILE) - 1],
+             format, args, mIsSetLogFileInitalized);
     va_end(args);
 
     return;

@@ -35,6 +35,7 @@ set(SRC_FILES
 
 # Building Shared or Static Library
 if(${BUILD_SHARED_LIBS})
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     message(STATUS "Building Shared Library")
     add_library(
         ${PROJECT_NAME} SHARED
