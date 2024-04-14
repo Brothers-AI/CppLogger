@@ -15,6 +15,11 @@
 #include <Windows.h>
 #include <stdint.h>
 #include <time.h>
+
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+
 #else
 #include <sys/time.h>
 #endif // _WIN32
@@ -66,7 +71,7 @@ void printLog(Logger::LogStream stream, const char *logLevelName, const char *co
 #ifdef _WIN32
     // Get System Time in Windows
     SYSTEMTIME sysTime;
-    GetSystemTime(&sysTime);
+    GetLocalTime(&sysTime);
     sprintf(dateTime, "%d-%02d-%02d %02d:%02d:%02d:%03d",
             sysTime.wYear, sysTime.wMonth, sysTime.wDay,
             sysTime.wHour, sysTime.wMinute, sysTime.wSecond, sysTime.wMilliseconds);
@@ -496,4 +501,12 @@ Logger::Logger()
 
     // Set mIsSetLogFileInitalized to false
     mIsSetLogFileInitalized = false;
+
+#ifdef _WIN32
+    // Flag setting for Color in Windows Console
+    HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
+    SetConsoleMode(hInput, ENABLE_VIRTUAL_TERMINAL_INPUT);
+    HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleMode(hOutput, ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+#endif // _WIN32
 }
