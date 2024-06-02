@@ -9,6 +9,7 @@
 // System Includes
 #include <string>
 #include <cstring>
+#include <mutex>
 
 #if _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -26,6 +27,9 @@
 
 // Logger Includes
 #include <CppLogger.h>
+
+// Mutex for logging
+static std::mutex s_logMutex;
 
 /**
  * @brief Color Codes for Different Log Levels
@@ -95,6 +99,9 @@ void printLog(Logger::LogStream stream, const char *logLevelName, const char *co
         // Output Stream in stdout
         if (isSavingToFile)
         {
+            // To avoid interleved messages
+            std::lock_guard<std::mutex> lock(s_logMutex);
+
             // Remove the color codes from the string
             fprintf(stdout, "[%s]:[%s] ", dateTime, logLevelName);
             vfprintf(stdout, format, args);
@@ -102,6 +109,9 @@ void printLog(Logger::LogStream stream, const char *logLevelName, const char *co
         }
         else
         {
+            // To avoid interleved messages
+            std::lock_guard<std::mutex> lock(s_logMutex);
+
             fprintf(stdout, "%s[%s]:[%s] ", colorCode, dateTime, logLevelName);
             vfprintf(stdout, format, args);
             vfprintf(stdout, "\033[1;0m\n", args);
@@ -112,6 +122,9 @@ void printLog(Logger::LogStream stream, const char *logLevelName, const char *co
         // Output Stream in stderr
         if (isSavingToFile)
         {
+            // To avoid interleved messages
+            std::lock_guard<std::mutex> lock(s_logMutex);
+
             // Remove the color codes from the string
             fprintf(stderr, "[%s]:[%s] ", dateTime, logLevelName);
             vfprintf(stderr, format, args);
@@ -119,6 +132,9 @@ void printLog(Logger::LogStream stream, const char *logLevelName, const char *co
         }
         else
         {
+            // To avoid interleved messages
+            std::lock_guard<std::mutex> lock(s_logMutex);
+
             fprintf(stderr, "%s[%s]:[%s] ", colorCode, dateTime, logLevelName);
             vfprintf(stderr, format, args);
             vfprintf(stderr, "\033[1;0m\n", args);
