@@ -71,7 +71,7 @@ void printAvaialbleLogs()
 void printLog(Logger::LogStream stream, const char *logLevelName, const char *colorCode,
               const char *format, va_list args, bool isSavingToFile)
 {
-    char dateTime[30];
+    char dateTime[40];
 #ifdef _WIN32
     // Get System Time in Windows
     SYSTEMTIME sysTime;
@@ -85,13 +85,10 @@ void printLog(Logger::LogStream stream, const char *logLevelName, const char *co
     // Get time
     gettimeofday(&currTime, NULL);
 
-    // Get Milliseconds time
-    int milliSeconds = currTime.tv_usec / 1000;
-
     struct tm tm = *localtime(reinterpret_cast<time_t *>(&currTime.tv_sec));
-    sprintf(dateTime, "%d-%02d-%02d %02d:%02d:%02d:%03d",
+    sprintf(dateTime, "%d-%02d-%02d %02d:%02d:%02d:%06d",
             tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
-            tm.tm_hour, tm.tm_min, tm.tm_sec, milliSeconds);
+            tm.tm_hour, tm.tm_min, tm.tm_sec, currTime.tv_usec);
 #endif // _WIN32
 
     if (Logger::LogStream::STDOUT == stream)
